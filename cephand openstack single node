@@ -1,0 +1,431 @@
+##################Replace cephadmin username accordingly
+useradd -m -s /bin/bash cephadmin
+passwd cephadmin
+echo "cephadmin ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/cephadmin
+chmod 0440 /etc/sudoers.d/cephadmin
+
+###########Install Docker on Each ceph nodes on  ubuntu ##########################3
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt -y update
+sudo apt -y install docker-ce
+
+
+sudo systemctl enable --now docker
+
+
+##############Ceph initial deploy on (cephadm) node1    ##############
+curl -fsSL https://download.ceph.com/keys/release.asc | sudo gpg --dearmor -o /usr/share/keyrings/ceph-release.gpg
+echo "deb [signed-by=/usr/share/keyrings/ceph-release.gpg] https://download.ceph.com/debian-reef/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/ceph.list
+sudo apt-get update
+apt-cache policy ceph
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/reef/src/cephadm/cephadm
+
+chmod +x cephadm
+apt -y update && apt -y upgrade
+apt -y install cephadm
+cephadm version
+
+cephadm add-repo --release reef 
+sudo cephadm install
+
+sudo cephadm install ceph-common 
+
+############## bootstrap mon host #####################33
+
+sudo cephadm bootstrap --mon-ip  192.168.122.56 --initial-dashboard-user admin  --initial-dashboard-password admin098! --dashboard-password-noupdate
+
+
+####################Set public network for our ceph cluster ############333
+
+sudo ceph config set mon public_network 192.168.122.0/24
+
+###################Deploy monitors on a specific set of hosts ###############3
+ceph orch host ls
+
+sudo ceph orch apply mon "ceph1"
+ 
+########## ceph add lable ############333
+sudo ceph orch host label add ceph1 mon
+
+###############ceph list hosts ##############
+
+sudo ceph osd tree | column -t -s $'\t'
+
+######### add osd host###############3
+############################# tell ceph to consume any available and unused devices#####################
+ceph orch device ls
+
+################## create osd from a specific device on a specific host ######################################3
+vi osd_ceph1.yaml
+service_type: osd
+service_id: ceph1_osd
+service_name: osd.ceph1_osd
+placement:
+  host_pattern: 'ceph1'
+spec:
+  data_devices:
+    paths:
+    - /dev/vdb
+    - /dev/vdc
+    
+ceph orch apply osd -i osd_ceph1.yaml
+
+###############This sets the default replica size for any new pools you create.############
+
+ceph config set global osd_pool_default_size 1
+##############check s replica size######################
+ceph config get global osd_pool_default_size
+
+
+######## DEPLOY RGWS service #####################
+
+ceph orch host label add ceph1 rgw
+ceph orch apply rgw radosGW '--placement=label:rgw count-per-host:1' --port=8080
+
+
+################# rgw user list and info  #########3
+
+radosgw-admin user list
+radosgw-admin user info --uid=dashboard
+
+############# mgr set up in all node
+ceph orch apply mgr --placement=" ceph1 "
+ceph balancer on
+
+###################all node install################
+ apt install -y chrony && apt install -y s3cmd
+ 
+######################create .s3cfg file############
+ vim /root/.s3cfg
+Add the below content:
+
+[default]
+access_key = AG3ID7L6IIGJPYYPCPBD
+secret_key = OsJWaY4kDpggeEVvZ0LDg09dqE6GUQWZL5nNvMET
+
+host_base = http://192.168.122.55:8080
+host_bucket = http://192.168.122.55:8080
+use_https = False
+
+##########################################
+To verify key and other functionality of s3cmd
+
+To create bucket
+         s3cmd mb s3://rah010
+	
+output:
+Bucket 's3://rah010/' created
+
+	To list the bucket:
+	    s3cmd ls
+	
+output:
+root@swift-upgrade:~# s3cmd ls
+-02-03 16:45  s3://rah01
+2009-02-03 16:45  s3://rah010S
+
+
+##############################################
+
+Integration commands for ceph&openstack
+########Post deploy through ceph admin, follow the steps below to use ceph with openstack. This will work only when using Kolla-Ansible to deploy OSP.
+
+ceph osd pool create volumes
+ceph osd pool create images
+ceph osd pool create vms
+ceph osd pool create gnocchi
+ceph osd pool create backups
+
+
+######Verify
+ceph osd pool ls
+
+#########initialize the pools ##############
+
+rbd pool init volumes
+rbd pool init images
+rbd pool init vms
+rbd pool init gnocchi
+rbd pool init backups
+#####################
+
+##################Create keyrings ####################
+
+
+ceph auth get-or-create client.glance mon 'profile rbd' osd 'profile rbd pool=images' mgr 'profile rbd pool=images' > /root/ceph.client.glance.keyring
+
+ceph auth get-or-create client.cinder mon 'profile rbd' osd 'profile rbd pool=volumes, profile rbd pool=vms, profile rbd-read-only pool=images' mgr 'profile rbd pool=volumes, profile rbd pool=vms' > /root/ceph.client.cinder.keyring
+
+ceph auth get-or-create client.cinder-backup mon 'profile rbd' osd 'profile rbd pool=backups' mgr 'profile rbd pool=backups' > /root/ceph.client.cinder-backup.keyring
+
+ceph auth get-or-create client.gnocchi mon 'profile rbd' osd 'profile rbd pool=gnocchi' mgr 'profile rbd pool=gnocchi' > /root/ceph.client.gnocchi.keyring
+
+ceph auth add client.manila mon 'profile rbd' osd 'profile rbd pool=gnocchi' mgr 'profile rbd pool=gnocchi' > /root/ceph.client.gnocchi.keyring
+
+ceph auth get-or-create client.nova mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=vms, allow rx pool=images' -o /root/ceph.client.nova.keyring
+
+###########Configure Manila Keyring:#######
+
+ceph auth caps client.manila osd 'allow rw pool=cephfs_data' mgr 'allow rw' mon 'allow r'
+ceph auth get client.manila -o /root/manila.keyring
+
+
+################### kolla singlenode deploy #########
+##############on ansible node  ###
+######on sorage node
+
+sudo apt update -y && apt upgrade -y 
+sudo apt update
+lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+￼
+###Install dependencies not using a virtual environment###
+
+sudo apt install git python3-dev libffi-dev gcc libssl-dev -y
+
+################### Install dependencies ##############
+
+sudo apt install python3-venv -y
+
+python3 -m venv /opt/osp
+source /opt/osp/bin/activate
+
+pip install -U pip
+
+############################ Install Kolla-ansible  ###########################
+
+
+pip install 'ansible-core>=2.15,<2.16'
+
+sudo apt install ansible -y
+
+############################ Install kolla-ansible and its dependencies using pip. ###############
+
+
+pip install git+https://opendev.org/openstack/kolla-ansible@stable/2024.1
+
+sudo mkdir -p /etc/kolla
+sudo chown $USER:$USER /etc/kolla
+
+cp -r /opt/osp/share/kolla-ansible/etc_examples/kolla/* /etc/kolla
+cp /opt/osp/share/kolla-ansible/ansible/inventory/* .
+
+
+############################  Install Ansible Galaxy requirements ############################
+
+kolla-ansible install-deps
+
+#####################Passwords used in our deployment are stored in /etc/kolla/passwords.yml file. All passwords are blank in this file and have to be filled either manually or by running random password generator 
+sudo ln -s /usr/bin/python3 /usr/bin/python
+cd kolla-ansible/tools
+./generate_passwords.py
+
+kolla-genpwd
+
+
+##############globals.yml is the main configuration file for Kolla Ansible. 
+############################ need to more research on it 
+vi /etc/kolla/globals.yml
+
+---
+################Services enabled by default############
+#Keystone, Glance, Nova, Placement, Neutron, Cinder, Heat, Horizon. 
+kolla_base_distro: "ubuntu"
+kolla_install_type: "binary"
+enable_haproxy: "yes"
+keepalived_virtual_router_id: "51"
+enable_chrony: "yes"
+enable_etcd: "yes"
+config_strategy: "COPY_ALWAYS"
+enable_redis: "yes"
+
+#################################### Monitoring Services
+enable_prometheus: "yes"
+enable_grafana: "yes"
+prometheus_node_exporter_port: "9101"
+grafana_server_port: "3001"
+prometheus_alertmanager_port: "9097"
+prometheus_alertmanager_cluster_port: "9096"
+prometheus_haproxy_exporter_port: "9111"
+
+
+###################### neutron Services ###########
+#kolla_external_vip_address: "10.121.220.50"  # Internal VIP
+kolla_internal_vip_address: "192.168.122.130"  # Internal VIP
+api_interface: "enp1s0"
+#tunnel_interface: "bond0"
+network_interface: "enp1s0"
+neutron_external_interface: "enp3s0,enp4s0"
+neutron_bridge_name: "br-ex,br-lb"
+
+
+######################################################## Image Services ######
+glaenable_neutron_provider_networks: "yes"
+enable_neutron_qos: "yes"
+enable_neutron_agent_ha: "Yes" ################### HA for neutron agentnce_backend_ceph: "yes"
+ceph_glance_keyring: "client.glance.keyring"
+ceph_glance_user: "glance"
+ceph_glance_pool_name: "images"
+enable_glance_image_cache: "yes"
+
+################################################### Nova #############
+nova_compute_virt_type: "kvm"
+nova_backend_ceph: "yes"
+ceph_nova_keyring: "client.cinder.keyring"
+ceph_nova_user: "cinder"
+ceph_nova_pool_name: "vms"
+nova_console: "novnc"
+
+############################# Cinder services  ################
+
+################### Cinder_volume in ceph ###
+enable_hacluster: "yes"
+enable_cinder: "yes"
+cinder_backend_ceph: "yes"
+ceph_cinder_keyring: "client.cinder.keyring"
+ceph_cinder_user: "cinder"
+ceph_cinder_pool_name: "volumes"
+############################# Cinder_backup in ceph ###
+enable_cinder_backup: "yes"
+ceph_cinder_backup_keyring: "client.cinder-backup.keyring"
+ceph_cinder_backup_user: "cinder-backup"
+ceph_cinder_backup_pool_name: "backups"
+
+######################################### Metric #####
+#enable_ceilometer: "yes"
+#enable_gnocchi: "yes"
+#gnocchi_backend_storage: "ceph"
+#ceph_gnocchi_keyring: "client.gnocchi.keyring"
+
+#################instance HA
+enable_masakari: "yes"
+###################enable_barbican#######
+enable_barbican: "yes"
+
+###############magnum
+enable_magnum: "yes"
+enable_cluster_user_trust: True
+enable_octavia: "yes"
+octavia_auto_configure: "yes"
+
+octavia_amp_network:
+  name: "lb-mgmt-net"
+  provider_network_type: "flat"
+  provider_physical_network: "physnet2"
+  external: false
+  shared: false
+  subnet:
+    name: "lb-mgmt-subnet"
+    cidr: "192.168.122.0/24"
+    allocation_pool_start: "192.168.122.150"
+    allocation_pool_end0.16.0.0/16200"
+    gateway_ip: "192.168.10.1" 0enable_dhcp: "yes"
+##############0##Si255and S3 options #########0.16.0.1e_swift_s3api: "yes"
+enable_ceph_rgw: true
+enable_swift: "no"
+enable_ceph_rgw_keystone: true
+ceph_rgw_swift_compatibility: "false"
+ceph_rgw_swift_account_in_url: "false"
+ceph_rgw_hosts:
+  - host: ceph1
+    ip: 192.168.122.56
+    port: 8080
+  - host: ceph2
+    ip: 192.168.122.58
+    port 8080
+  - host: ceph3
+    ip 192.168.122.60
+    port: 8080
+
+################## TlS
+#######################################
+mkdir -p /etc/kolla/config/{nova,cinder,glance,gnocchi}
+tree /etc/kolla/config/
+/etc/kolla/config/
+├── cinder
+│ ├── cinder-backup
+│ │ ├── ceph.client.cinder-backup.keyring
+│ │ ├── ceph.client.cinder.keyring
+│ │ └── ceph.conf
+│ └── cinder-volume
+│ ├── ceph.client.cinder.keyring
+│ └── ceph.conf
+├── cinder.conf
+├── freezer.conf
+├── glance
+│ ├── ceph.client.cinder.keyring
+│ ├── ceph.client.glance.keyring
+│ ├── ceph.client.nova.keyring
+│ └── ceph.conf
+├── glance.conf
+├── horizon
+│ └── custom_local_settings
+└── nova
+├──  
+├── ceph.client.nova.keyring
+└── ceph.conf
+
+mkdir -p /etc/kolla/config/cinder/cinder-backup
+mkdir -p  /etc/kolla/config/cinder/cinder-volume
+cp ceph.client.cinder.keyring /etc/kolla/config/cinder/cinder-volume
+cp ceph.client.cinder-backup.keyring /etc/kolla/config/cinder/cinder-backup
+cp ceph.client.cinder.keyring /etc/kolla/config/nova
+cp ceph.client.glance.keyring /etc/kolla/config/glance
+cp /etc/ceph/ceph.conf /etc/kolla/config/glance
+cp /etc/ceph/ceph.conf /etc/kolla/config/nova
+cp /etc/ceph/ceph.conf  /etc/kolla/config/cinder/cinder-backup
+cp /etc/ceph/ceph.conf  /etc/kolla/config/cinder/cinder-volume
+mkdir -p /etc/kolla/config/{horizon,octavia}
+touch /etc/kolla/config/{cinder.conf,glance.conf,freezer.conf}
+########################################### Deployment ###############################
+
+
+kolla-ansible -i ./all-in-one bootstrap-servers
+###############TASK [openstack.kolla.docker_sdk : Install docker SDK for python using pip] ****###############
+
+apt install -y libdbus-1-dev libdbus-glib-1-dev python3-dev gcc
+
+
+kolla-ansible -i ./all-in-one prechecks
+
+########## if docker sdk version fail #########
+
+sudo pip install docker
+
+
+kolla-ansible -i ./all-in-one deploy
+
+
+##################### Using OpenStack ############################################
+
+
+pip install python-openstackclient -c https://releases.openstack.org/constraints/upper/master
+
+kolla-ansible post-deploy
+
+/path/to/venv/share/kolla-ansible/init-runonce
+
+
+##############################################
+openstack flavor create --id 1 --ram 512 --disk 1 --vcpus 1 m1.tiny
+openstack flavor create --id 2 --ram 2048 --disk 20 --vcpus 1 m1.s1all
+openstack flavor create --id 3 --ram 4096 --disk 40 --vcpus 2 m1.2medium
+openstack flavor create --id 4 --ram 8192 --disk 80 --vcpus 4 m14.large
+openstack flavor create --id 5 --ram 16384 --disk 160 --vcpus 8 m18.xlarge
+
+#######################################################
+wget https://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img
+wget https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+
+############################################################
+openstack image create "cirros" --file cirros-0.6.2-x86_64-disk.img   --disk-format qcow2  --container-format bare --public
+openstack image create "amphora" --file octavia-amphora-haproxy-2025.1.qcow2   --disk-format qcow2  --container-format bare --project service --tag amphora  --public
+
+
+
+
+
