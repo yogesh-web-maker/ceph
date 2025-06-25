@@ -1,0 +1,392 @@
+server 1 #####################
+ ssh login access 
+i will check networking to google ping  , it is ok
+ip  it is ok 
+i will check to server pingable and not 
+server1 to server2 pingable
+server1to server3 is pingable
+disk 
+Sda	10.91 TiB
+Sdb	10.91 TiB
+nvem0n1	2.91 TiB                             
+nvem2n1	2.91 TiB
+nvem3n1	2.91 TiB
+nvem1n1	2.91 TiB
+sdc 	10.91 TiB
+sdd	10.91 TiB
+sde	10.91 TiB                                         9disk = 98.19
+sdf	10.91 TiB
+sdg	10.91 TiB
+sdh	10.91 TiB                                             10disk = 109.1
+sdi	10.91 TiB
+sdj	10.91 TiB
+sdk	10.91 TiB
+sdl	10.91 TiB
+sdm	10.91 TiB
+sdn	10.91 TiB
+sdo	10.91 TiB
+sdp	10.91 TiB
+sdq	10.91 TiB
+sdr	10.91 TiB
+sds	10.91 TiB
+sdt	10.91 TiB
+sdu	10.91 TiB
+sdv	10.91 TiB
+sdw	10.91 TiB
+sdx	10.91 TiB
+sdy	10.91 TiB
+sdz	10.91 TiB
+sdaa	10.91 TiB
+sdab	10.91 TiB
+sdac	10.91 TiB
+sdad	10.91 TiB
+sdae	10.91 TiB
+sdaf	10.91 TiB
+sdag	10.91 TiB
+sdah	10.91 TiB
+sdai	10.91 TiB
+sdaj	10.91 TiB
+sdak	10.91 TiB
+sdal	10.91 TiB
+sdam	10.91 TiB
+sdan	10.91 TiB
+sdao	10.91 TiB
+sdap	10.91 TiB
+sdaq	10.91 TiB
+sdar	10.91 TiB
+sdas	10.91 TiB
+sdat	238.47 GIB
+/dev/sdat1    2048      4095      2048     1M BIOS boot
+/dev/sdat2    4096   4198399   4194304     2G Linux filesystem
+/dev/sdat3 4198400 500115455 495917056 236.5G Linux filesystem
+sdau	238.47 GIB
+sdav	10.91 TiB
+
+server 2 ###################
+ssh login access for server 1 to server2
+i will check networking to google ping  , it is ok
+ip ok
+i will check to server pingable and not 
+server2 to server1 pingable
+server2 to server2 pingable
+disk 
+Disk-Name	Type
+nvem0n1	2.91 TiB
+nvem1n1	2.91 TiB
+nvem2n1	2.91 TiB
+nvem3n1	2.91 TiB
+sda	7.84 GiB
+sdb	10.91 TiB
+sdc	10.91 TiB
+sdd	10.91 TiB
+sde	10.91 TiB                                         9disk = 98.19
+sdf	10.91 TiB                                         10disk = 109.1
+sdg	10.91 TiB
+sdh	10.91 TiB
+sdi	10.91 TiB
+sdj	10.91 TiB
+sdk	10.91 TiB
+sdl	10.91 TiB
+sdm	10.91 TiB
+sdn	10.91 TiB
+sdo	10.91 TiB
+sdp	10.91 TiB
+sdq	10.91 TiB
+sdr	10.91 TiB
+sds	10.91 TiB
+sdt	10.91 TiB
+sdu	10.91 TiB
+sdv	10.91 TiB
+sdw	10.91 TiB
+sdx	10.91 TiB
+sdy	10.91 TiB
+sdz	10.91 TiB
+sdaa	10.91 TiB
+sdab	10.91 TiB
+sdac	10.91 TiB
+sdad	10.91 TiB
+sdae	10.91 TiB
+sdaf	10.91 TiB
+sdag	10.91 TiB
+sdah	10.91 TiB
+sdai	10.91 TiB
+sdaj	10.91 TiB
+sdak	10.91 TiB
+sdal	10.91 TiB
+sdam	10.91 TiB
+sdan	10.91 TiB
+sdao	10.91 TiB
+sdap	10.91 TiB
+sdaq	223.57 GIB
+Disk /dev/sdar: 223.57 GiB, 240057409536 bytes, 468862128 sectors
+/dev/sdar1    2048      4095      2048     1M BIOS boot
+/dev/sdar2    4096   4198399   4194304     2G Linux filesystem
+/dev/sdar3 4198400 468858879 464660480 221.6G Linux filesystem
+
+sdar	223.57 GIB
+
+server3#######3
+ssh login access i will check server2 to server3
+i will check networking to google ping  , it is ok
+ip ok
+i will check to server pingable and not 
+server3 to server1 pingable
+server3 to server2 pingable
+disk 
+Disk-Name	Type
+nvem0n1	6.99 TiB
+nvem1n1	6.99 TiB
+nvem2n1	6.99 TiB
+nvem3n1	6.99 TiB
+sda	447.13 GiB
+sdb	447.13 GiB
+/dev/sdb1     2048      4095      2048     1M BIOS boot
+/dev/sdb2     4096   4198399   4194304     2G Linux filesystem
+/dev/sdb3  4198400 937699327 933500928 445.1G Linux filesystem
+
+sdc	14.55 TiB
+sdd	14.55 TiB
+sde	14.55 TiB
+sdf	14.55 TiB                    7disk total =101.85
+sdg	14.55 TiB
+sdh	14.55 TiB
+sdi	14.55 TiB
+sdj	14.55 TiB
+sdk	14.55 TiB
+sdl	14.55 TiB
+sdm	14.55 TiB
+sdn	14.55 TiB
+sdo	14.55 TiB
+sdp	14.55 TiB
+sdq	14.55 TiB
+sdr	14.55 TiB
+sds	14.55 TiB
+sdt	14.55 TiB
+sdu	14.55 TiB
+sdv	14.55 TiB
+sdw	14.55 TiB
+sdx	14.55 TiB
+sdy	14.55 TiB
+sdz	14.55 TiB
+sdaa	14.55 TiB
+sdab	14.55 TiB
+sdac	14.55 TiB
+sdad	14.55 TiB
+sdae	14.55 TiB
+sdaf	14.55 TiB
+sdag	14.55 TiB
+sdah	14.55 TiB
+sdai	14.55 TiB
+sdaj	14.55 TiB
+sdak	14.55 TiB
+sdal	14.55 TiB
+sdam	14.55 TiB
+sdan	14.55 TiB
+sdao	14.55 TiB
+sdap	14.55 TiB
+sdaq	14.55 TiB
+sdar	14.55 TiB
+sdas	14.55 TiB
+sdat	14.55 TiB
+sdau	14.55 TiB
+sdav	14.55 TiB
+sdaw	14.55 TiB
+sdax	14.55 TiB
+sday	14.55 TiB
+sdaz	14.55 TiB
+sdba	14.55 TiB
+sdbb	14.55 TiB
+sdbc	14.55 TiB
+sdbd	14.55 TiB
+sdbe	14.55 TiB
+sdbf	14.55 TiB
+sdbg	14.55 TiB
+sdbh	14.55 TiB
+sdbi	14.55 TiB
+sdbj	14.55 TiB
+sdbk	14.55 TiB
+sdbl	14.55 TiB
+sdbm	14.55 TiB
+sdbn	14.55 TiB
+sdbo	14.55 TiB
+sdbp	14.55 TiB
+sdbq	14.55 TiB
+sdbr	14.55 TiB
+sdbs	14.55 TiB
+sdbt	14.55 TiB
+sdbu	14.55 TiB
+sdbv	14.55 TiB
+sdbw	14.55 TiB
+sdbx	14.55 TiB
+sdby	14.55 TiB
+sdbz	14.55 TiB
+sdca	14.55 TiB
+sdcb	14.55 TiB
+sdcc	14.55 TiB
+sdcd	14.55 TiB
+sdce	14.55 TiB
+sdcf	14.55 TiB
+sdcg	14.55 TiB
+sdch	14.55 TiB
+sdci	14.55 TiB
+sdcj	14.55 TiB
+sdck	14.55 TiB
+sdcl	14.55 TiB
+sdcm	14.55 TiB
+sdcn	14.55 TiB
+sdco	14.55 TiB
+sdcp	14.55 TiB
+sdcq	14.55 TiB
+sdcr	14.55 TiB
+sdcs	14.55 TiB
+sdct	14.55 TiB
+sdcu	14.55 TiB
+sdcv	14.55 TiB
+sdcw	14.55 TiB
+sdcx	14.55 TiB
+sdcy	14.55 TiB
+
+
+
+ceph installation step########################
+
+
+step 1
+
+SH Access.
+SSH into each node using the static IPs:
+ssh x.x.x.x
+
+
+step 2###############################
+
+check to /etc/hosts File on All Nodes .
+Edit the /etc/hosts file:
+
+step 3#####
+
+update and upgrade system packages:##########################
+sudo apt-get update
+sudo apt-get upgrade -y
+
+
+step 4###########
+
+
+##################Replace cephadmin username accordingly
+useradd -m -s /bin/bash cephadmin
+passwd cephadmin
+echo "cephadmin ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers.d/cephadmin
+chmod 0440 /etc/sudoers.d/cephadmin
+
+###########Install Docker on Each ceph nodes on  ubuntu ##########################3
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt -y update
+sudo apt -y install docker-ce
+
+
+sudo systemctl enable --now docker
+
+
+##############Ceph initial deploy on (cephadm) node1    ##############
+curl -fsSL https://download.ceph.com/keys/release.asc | sudo gpg --dearmor -o /usr/share/keyrings/ceph-release.gpg
+echo "deb [signed-by=/usr/share/keyrings/ceph-release.gpg] https://download.ceph.com/debian-reef/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/ceph.list
+sudo apt-get update
+apt-cache policy ceph
+curl --silent --remote-name --location https://github.com/ceph/ceph/raw/18.2.4/src/cephadm/cephadm
+
+chmod +x cephadm
+apt -y update && apt -y upgrade
+apt -y install cephadm
+cephadm version
+
+cephadm add-repo --release reef 
+sudo cephadm install
+
+sudo cephadm install ceph-common 
+
+############## bootstrap mon host #####################33
+
+sudo cephadm bootstrap --mon-ip  10.138.231.81 --initial-dashboard-user admin  --initial-dashboard-password admin098! --dashboard-password-noupdate
+
+##############Copy keys to root user to other cephs
+ssh-keygen
+cat .ssh/id_rsa.pub
+vi .ssh/authorized_keys
+
+
+ssh-copy-id -f -i /etc/ceph/ceph.pub root@cephd2
+ssh-copy-id -f -i /etc/ceph/ceph.pub root@cephd4
+
+###############Ceph cephs add via orch(orchestrator)
+
+sudo ceph orch host add cephd2 10.138.231.82
+sudo ceph orch host add cephd4 10.138.231.84
+
+
+####################Set public network for our ceph cluster ############333
+
+sudo ceph config set mon public_network 10.138.230.0/23
+
+###################Deploy monitors on a specific set of hosts ###############3
+ceph orch host ls
+
+sudo ceph orch apply mon "cephd1,cephd4"
+ 
+ ########## ceph add lable ############333
+ sudo ceph orch host label add cephd1 mon
+sudo ceph orch host label add cephd2 mon
+sudo ceph orch host label add cephd4 mon
+
+ceph orch host ls
+
+###############ceph list hosts ##############
+
+sudo ceph osd tree | column -t -s $'\t'
+
+######### add osd host###############3
+############################# tell ceph to consume any available and unused devices#####################
+ceph orch device ls
+ceph orch apply osd --all-available-devices #######################if you dont know the disk name 
+
+################## create osd from a specific device on a specific host ######################################3
+service_type: osd
+service_id: ceph1_osd
+service_name: osd.ceph1_osd
+placement:
+  host_pattern: 'ceph1'
+spec:
+  data_devices:
+    paths:
+    - /dev/vdb
+    unmanaged: False
+sudo ceph orch daemon add osd cephd1:/dev/sdc  --HDD --10.91(TiB)
+sudo ceph orch daemon add osd cephd2:/dev/sdc  --HDD --10.91(TiB)
+sudo ceph orch daemon add osd cephd4:/dev/sdc  --HDD --14.55(TiB)
+ceph orch apply osd -i osd_cephd1.yaml
+ceph orch apply osd -i osd_cephd2.yaml
+
+ceph orch apply osd -i osd_cephd4.yaml
+
+######## DEPLOY RGWS service #####################
+
+ceph orch host label add cephd1 rgw
+ceph orch host label add cephd2 rgw
+ceph orch host label add cephd4 rgw
+ceph orch apply rgw foo '--placement=label:rgw count-per-host:1' --port=8000
+
+################# rgw user list and info  #########3
+
+radosgw-admin user list
+radosgw-admin user info --uid=dashboard
+
+############# mgr set up in all node
+ceph orch apply mgr --placement=" cephd1 cephd4 "
+ceph balancer on
+
+###################all node install################
+ apt install -y chrony && apt install -y s3cmd
